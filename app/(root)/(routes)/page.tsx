@@ -14,10 +14,5 @@ export default function Home() {
     }
   }, [isOpen, onOpen]);
 
-  return (
-    <main>
-      <UserButton afterSignOutUrl="/" />
-      <StoreModal />
-    </main>
-  );
+  return null;
 }
