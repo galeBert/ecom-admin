@@ -5,7 +5,6 @@ import React, { ReactNode } from "react";
 
 export default async function layout({ children }: { children: ReactNode }) {
   const { userId } = auth();
-
   if (!userId) {
     redirect("/sign-in");
   }

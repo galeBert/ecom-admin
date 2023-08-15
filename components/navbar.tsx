@@ -11,7 +11,10 @@ export default async function Navbar() {
   if (!userId) {
     redirect("/sign-in");
   }
+
   const items = await prismadb.store.findMany({ where: { userId } });
+  
+
   return (
     <div className="border-b">
       <div className="flex items-center px-4 h-16">

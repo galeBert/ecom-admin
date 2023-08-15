@@ -51,7 +51,7 @@ export default function StoreSwitcher({
 
   const onStoreSelect = (store: { label: string; value: string }) => {
     setisOpen(false);
-    router.push(`/${store.value}}`);
+    router.push(`/${store.value}`);
   };
 
   return (
