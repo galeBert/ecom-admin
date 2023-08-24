@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 
 import * as z from "zod";
-import { Billboard, Store } from "@prisma/client";
+import { Size } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -16,6 +16,7 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
@@ -23,36 +24,41 @@ import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { AlertModal } from "@/components/modals/alert-modal";
 import ImageUpload from "@/components/ui/image-upload";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
-interface BillboardFormProps {
-  initialData: Billboard | null;
+interface SizesFormProps {
+  initialData: Size | null;
 }
 const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1),
+  value: z.string().min(1),
 });
 
 type SettingsFromValues = z.infer<typeof formSchema>;
 
-export default function BillboardForm({ initialData }: BillboardFormProps) {
+export default function SizesForm({ initialData }: SizesFormProps) {
   const params = useParams();
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const title = initialData ? "Edit billboard" : "Create billboard";
-  const description = initialData ? "Edit a billboard." : "Add a new billboard";
-  const toastMessage = initialData
-    ? "Billboard updated."
-    : "Billboard created.";
+  const title = initialData ? "Edit sizes" : "Create sizes";
+  const description = initialData ? "Edit a sizes." : "Add a new sizes";
+  const toastMessage = initialData ? "Sizes updated." : "Sizes created.";
   const action = initialData ? "Save changes" : "Create";
 
   const form = useForm<SettingsFromValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: "",
-      imageUrl: "",
+      name: "",
+      value: "",
     },
   });
 
@@ -61,13 +67,13 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
       setIsLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/billboards/${params.billboardId}`,
+          `/api/${params.storeId}/sizes/${params.sizeId}`,
           data
         );
-        router.push(`/${params.storeId}/billboards`);
+        router.push(`/${params.storeId}/sizes`);
       } else {
-        await axios.post(`/api/${params.storeId}/billboards`, data);
-        router.push(`/${params.storeId}/billboards`);
+        await axios.post(`/api/${params.storeId}/sizes`, data);
+        router.push(`/${params.storeId}/sizes`);
       }
 
       router.refresh();
@@ -81,16 +87,12 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axios.delete(
-        `/api/${params.storeId}/billboards/${params.billboardId}`
-      );
+      await axios.delete(`/api/${params.storeId}/sizes/${params.sizeId}`);
       router.refresh();
-      router.push(`/${params.storeId}/billboards`);
-      toast.success("Billboard Deleted");
+      router.push(`/${params.storeId}/sizes`);
+      toast.success("Sizes Deleted");
     } catch (error) {
-      toast.error(
-        "Make sure you remove all categories using this billboard first"
-      );
+      toast.error("Make sure you remove all categories using this sizes first");
     } finally {
       setIsLoading(false);
       setIsOpen(false);
@@ -124,27 +126,9 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
-            name="imageUrl"
-            control={form.control}
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <FormLabel>Background Image</FormLabel>
-                  <FormControl>
-                    <ImageUpload
-                      value={field.value ? [field.value] : []}
-                      onChange={(url) => field.onChange(url)}
-                      onRemove={() => field.onChange("")}
-                    />
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          />
           <div className="grid grid-cols-3 gap-8">
             <FormField
-              name="label"
+              name="name"
               control={form.control}
               render={({ field }) => {
                 return (
@@ -153,7 +137,25 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        placeholder="Billboard label"
+                        placeholder="Sizes name"
+                        {...field}
+                      />
+                    </FormControl>
+                  </FormItem>
+                );
+              }}
+            />
+            <FormField
+              name="value"
+              control={form.control}
+              render={({ field }) => {
+                return (
+                  <FormItem>
+                    <FormLabel>Name</FormLabel>
+                    <FormControl>
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Sizes name"
                         {...field}
                       />
                     </FormControl>

@@ -46,10 +46,10 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
     defaultValues: initialData,
   });
 
-  const onSubmit = (data: SettingsFromValues) => {
+  const onSubmit = async (data: SettingsFromValues) => {
     try {
       setIsLoading(true);
-      axios.patch(`/api/stores/${params.storeId}`, data);
+      await axios.patch(`/api/stores/${params.storeId}`, data);
       router.refresh();
       toast.success("Store Name Changed");
     } catch (error) {
@@ -58,10 +58,10 @@ export default function SettingsForm({ initialData }: SettingsFormProps) {
       setIsLoading(false);
     }
   };
-  const onDelete = () => {
+  const onDelete = async () => {
     try {
       setIsLoading(true);
-      axios.delete(`/api/stores/${params.storeId}`);
+      await axios.delete(`/api/stores/${params.storeId}`);
       router.refresh();
       router.push("/");
       toast.success("Store Deleted");

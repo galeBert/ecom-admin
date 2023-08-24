@@ -6,6 +6,26 @@ interface IParams {
   billboardId: string;
   storeId: string;
 }
+
+export async function GET(req: Request, { params }: { params: IParams }) {
+  try {
+    if (!params.billboardId) {
+      return new NextResponse("Store ID is required", { status: 400 });
+    }
+
+    const billboard = await prismadb.billboard.findUnique({
+      where: {
+        id: params.billboardId,
+      },
+    });
+
+    return NextResponse.json(billboard);
+  } catch (error) {
+    console.log("[BILLBOARD_DELETE]", error);
+    return new NextResponse("initial Error", { status: 500 });
+  }
+}
+
 export async function PATCH(req: Request, { params }: { params: IParams }) {
   try {
     const body = await req.json();
@@ -63,20 +83,30 @@ export async function DELETE(req: Request, { params }: { params: IParams }) {
       return new NextResponse("Unauthenticated", { status: 401 });
     }
 
-    if (!params.storeId) {
+    if (!params.billboardId) {
       return new NextResponse("Store ID is required", { status: 400 });
     }
 
-    const store = await prismadb.store.deleteMany({
+    const storeByUserId = await prismadb.store.findFirst({
       where: {
         id: params.storeId,
         userId,
       },
     });
 
-    return NextResponse.json(store);
+    if (!storeByUserId) {
+      return new NextResponse("Unauthorized", { status: 403 });
+    }
+
+    const billboard = await prismadb.billboard.deleteMany({
+      where: {
+        id: params.billboardId,
+      },
+    });
+
+    return NextResponse.json(billboard);
   } catch (error) {
-    console.log("[STORE_DELETE]", error);
+    console.log("[BILLBOARD_DELETE]", error);
     return new NextResponse("initial Error", { status: 500 });
   }
 }

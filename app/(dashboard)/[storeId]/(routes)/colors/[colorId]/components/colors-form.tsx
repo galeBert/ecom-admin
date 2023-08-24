@@ -7,7 +7,7 @@ import { Separator } from "@/components/ui/separator";
 import { Heading } from "@/components/ui/heading";
 
 import * as z from "zod";
-import { Billboard, Store } from "@prisma/client";
+import { Size } from "@prisma/client";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
@@ -16,43 +16,42 @@ import {
   FormField,
   FormItem,
   FormLabel,
+  FormMessage,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import { AlertModal } from "@/components/modals/alert-modal";
-import ImageUpload from "@/components/ui/image-upload";
-
-interface BillboardFormProps {
-  initialData: Billboard | null;
+interface ColorsFormProps {
+  initialData: Size | null;
 }
 const formSchema = z.object({
-  label: z.string().min(1),
-  imageUrl: z.string().min(1),
+  name: z.string().min(1),
+  value: z.string().min(4).regex(/^#/, {
+    message: "String must be a valid hex code",
+  }),
 });
 
 type SettingsFromValues = z.infer<typeof formSchema>;
 
-export default function BillboardForm({ initialData }: BillboardFormProps) {
+export default function ColorsForm({ initialData }: ColorsFormProps) {
   const params = useParams();
   const router = useRouter();
 
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const title = initialData ? "Edit billboard" : "Create billboard";
-  const description = initialData ? "Edit a billboard." : "Add a new billboard";
-  const toastMessage = initialData
-    ? "Billboard updated."
-    : "Billboard created.";
+  const title = initialData ? "Edit colors" : "Create colors";
+  const description = initialData ? "Edit a colors." : "Add a new colors";
+  const toastMessage = initialData ? "Colors updated." : "Colors created.";
   const action = initialData ? "Save changes" : "Create";
 
   const form = useForm<SettingsFromValues>({
     resolver: zodResolver(formSchema),
     defaultValues: initialData || {
-      label: "",
-      imageUrl: "",
+      name: "",
+      value: "",
     },
   });
 
@@ -61,13 +60,13 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
       setIsLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/billboards/${params.billboardId}`,
+          `/api/${params.storeId}/colors/${params.sizeId}`,
           data
         );
-        router.push(`/${params.storeId}/billboards`);
+        router.push(`/${params.storeId}/colors`);
       } else {
-        await axios.post(`/api/${params.storeId}/billboards`, data);
-        router.push(`/${params.storeId}/billboards`);
+        await axios.post(`/api/${params.storeId}/colors`, data);
+        router.push(`/${params.storeId}/colors`);
       }
 
       router.refresh();
@@ -81,15 +80,13 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axios.delete(
-        `/api/${params.storeId}/billboards/${params.billboardId}`
-      );
+      await axios.delete(`/api/${params.storeId}/colors/${params.sizeId}`);
       router.refresh();
-      router.push(`/${params.storeId}/billboards`);
-      toast.success("Billboard Deleted");
+      router.push(`/${params.storeId}/colors`);
+      toast.success("Colors Deleted");
     } catch (error) {
       toast.error(
-        "Make sure you remove all categories using this billboard first"
+        "Make sure you remove all categories using this colors first"
       );
     } finally {
       setIsLoading(false);
@@ -124,27 +121,9 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
           onSubmit={form.handleSubmit(onSubmit)}
           className="space-y-8 w-full"
         >
-          <FormField
-            name="imageUrl"
-            control={form.control}
-            render={({ field }) => {
-              return (
-                <FormItem>
-                  <FormLabel>Background Image</FormLabel>
-                  <FormControl>
-                    <ImageUpload
-                      value={field.value ? [field.value] : []}
-                      onChange={(url) => field.onChange(url)}
-                      onRemove={() => field.onChange("")}
-                    />
-                  </FormControl>
-                </FormItem>
-              );
-            }}
-          />
           <div className="grid grid-cols-3 gap-8">
             <FormField
-              name="label"
+              name="name"
               control={form.control}
               render={({ field }) => {
                 return (
@@ -153,13 +132,36 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
                     <FormControl>
                       <Input
                         disabled={isLoading}
-                        placeholder="Billboard label"
+                        placeholder="Colors name"
                         {...field}
                       />
                     </FormControl>
                   </FormItem>
                 );
               }}
+            />
+            <FormField
+              control={form.control}
+              name="value"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Value</FormLabel>
+                  <FormControl>
+                    <div className="flex items-center gap-x-4">
+                      <Input
+                        disabled={isLoading}
+                        placeholder="Color value"
+                        {...field}
+                      />
+                      <div
+                        className="border p-4 rounded-full"
+                        style={{ backgroundColor: field.value }}
+                      />
+                    </div>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
             />
           </div>
           <Button className="ml-auto" type="submit">
