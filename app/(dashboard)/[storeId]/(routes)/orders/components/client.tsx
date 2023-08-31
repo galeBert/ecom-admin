@@ -24,11 +24,6 @@ export default function BillBoardClient({ orders }: OrderClientProps) {
           title={`Order (${orders.length})`}
           description="Manage order for your store"
         />
-
-        <Button onClick={() => router.push(`/${params.storeId}/orders/new`)}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add New
-        </Button>
       </div>
       <Separator />
       <DataTable columns={columns} data={orders} searchKey="products" />
