@@ -7,7 +7,7 @@ interface ColorsPageProps {
     colorId: string;
   };
 }
-export default async function BillBoardPage({ params }: ColorsPageProps) {
+export default async function ColorPage({ params }: ColorsPageProps) {
   const color = await prismadb.color.findUnique({
     where: { id: params.colorId },
   });

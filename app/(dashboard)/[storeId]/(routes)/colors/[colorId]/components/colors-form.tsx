@@ -60,7 +60,7 @@ export default function ColorsForm({ initialData }: ColorsFormProps) {
       setIsLoading(true);
       if (initialData) {
         await axios.patch(
-          `/api/${params.storeId}/colors/${params.sizeId}`,
+          `/api/${params.storeId}/colors/${params.colorId}`,
           data
         );
         router.push(`/${params.storeId}/colors`);
@@ -80,7 +80,7 @@ export default function ColorsForm({ initialData }: ColorsFormProps) {
   const onDelete = async () => {
     try {
       setIsLoading(true);
-      await axios.delete(`/api/${params.storeId}/colors/${params.sizeId}`);
+      await axios.delete(`/api/${params.storeId}/colors/${params.colorId}`);
       router.refresh();
       router.push(`/${params.storeId}/colors`);
       toast.success("Colors Deleted");

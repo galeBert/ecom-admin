@@ -6,14 +6,19 @@ import { ArrowUpDown } from "lucide-react";
 
 import CellAction from "./cell-action";
 
-export type ColorsCol = {
+export type ProductCol = {
   id: string;
-  value: string;
   name: string;
+  price: string;
+  category: string;
+  size: string;
+  color: string;
   createdAt: string;
+  isFeatured: boolean;
+  isArchived: boolean;
 };
 
-export const columns: ColumnDef<ColorsCol>[] = [
+export const columns: ColumnDef<ProductCol>[] = [
   {
     accessorKey: "name",
     header: ({ column }) => {
@@ -29,14 +34,34 @@ export const columns: ColumnDef<ColorsCol>[] = [
     },
   },
   {
-    accessorKey: "value",
-    header: "Value",
+    accessorKey: "isArchived",
+    header: "Archived",
+  },
+  {
+    accessorKey: "isFeatured",
+    header: "Featured",
+  },
+  {
+    accessorKey: "price",
+    header: "Price",
+  },
+  {
+    accessorKey: "category",
+    header: "Category",
+  },
+  {
+    accessorKey: "size",
+    header: "Size",
+  },
+  {
+    accessorKey: "color",
+    header: "Color",
     cell: ({ row }) => (
       <div className="flex items-center gap-x-2">
-        {row.original.value}
+        {row.original.color}
         <div
           className="h-6 w-6 rounded-full border"
-          style={{ backgroundColor: row.original.value }}
+          style={{ backgroundColor: row.original.color }}
         />
       </div>
     ),
@@ -46,11 +71,7 @@ export const columns: ColumnDef<ColorsCol>[] = [
     header: "Date",
   },
   {
-    id: "Actions",
-    cell: ({ row }) => {
-      const data = row.original;
-
-      return <CellAction data={data} />;
-    },
+    id: "actions",
+    cell: ({ row }) => <CellAction data={row.original} />,
   },
 ];
