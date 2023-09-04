@@ -25,26 +25,31 @@ export async function GET(req: Request, { params }: { params: IParams }) {
     return new NextResponse("initial Error", { status: 500 });
   }
 }
-
-export async function PATCH(req: Request, { params }: { params: IParams }) {
+export async function PATCH(
+  req: Request,
+  { params }: { params: { billboardId: string; storeId: string } }
+) {
   try {
-    const body = await req.json();
-    const { label, imageUrl } = body;
     const { userId } = auth();
 
+    const body = await req.json();
+
+    const { label, imageUrl } = body;
+
     if (!userId) {
-      return new NextResponse("Unauthenticated", { status: 401 });
+      return new NextResponse("Unauthenticated", { status: 403 });
     }
 
     if (!label) {
       return new NextResponse("Label is required", { status: 400 });
     }
+
     if (!imageUrl) {
-      return new NextResponse("ImageUrl is required", { status: 400 });
+      return new NextResponse("Image URL is required", { status: 400 });
     }
 
     if (!params.billboardId) {
-      return new NextResponse("Store ID is required", { status: 400 });
+      return new NextResponse("Billboard id is required", { status: 400 });
     }
 
     const storeByUserId = await prismadb.store.findFirst({
@@ -55,10 +60,10 @@ export async function PATCH(req: Request, { params }: { params: IParams }) {
     });
 
     if (!storeByUserId) {
-      return new NextResponse("Unauthorized", { status: 403 });
+      return new NextResponse("Unauthorized", { status: 405 });
     }
 
-    const billboards = await prismadb.billboard.updateMany({
+    const billboard = await prismadb.billboard.update({
       where: {
         id: params.billboardId,
       },
@@ -68,10 +73,10 @@ export async function PATCH(req: Request, { params }: { params: IParams }) {
       },
     });
 
-    return NextResponse.json(billboards);
+    return NextResponse.json(billboard);
   } catch (error) {
     console.log("[BILLBOARD_PATCH]", error);
-    return new NextResponse("initial Error", { status: 500 });
+    return new NextResponse("Internal error", { status: 500 });
   }
 }
 

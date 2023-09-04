@@ -64,16 +64,14 @@ export default function BillboardForm({ initialData }: BillboardFormProps) {
           `/api/${params.storeId}/billboards/${params.billboardId}`,
           data
         );
-        router.push(`/${params.storeId}/billboards`);
       } else {
         await axios.post(`/api/${params.storeId}/billboards`, data);
-        router.push(`/${params.storeId}/billboards`);
       }
-
       router.refresh();
+      router.push(`/${params.storeId}/billboards`);
       toast.success(toastMessage);
-    } catch (error) {
-      toast.error("Something went wrong");
+    } catch (error: any) {
+      toast.error("Something went wrong.");
     } finally {
       setIsLoading(false);
     }
