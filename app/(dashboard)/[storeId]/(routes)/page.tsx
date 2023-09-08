@@ -1,6 +1,8 @@
+import { getGraphRevenue } from "@/actions/get-graph-revenue";
 import { getSalesCount } from "@/actions/get-sales-count";
 import { getStocksCount } from "@/actions/get-stocks-count";
 import { getTotalRevenue } from "@/actions/get-total-revenue";
+import { Overview } from "@/components/overview";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Heading } from "@/components/ui/heading";
 import { Separator } from "@/components/ui/separator";
@@ -16,6 +18,7 @@ export default async function DashboardPage({
   const totalRevenue = await getTotalRevenue(params.storeId);
   const salesCount = await getSalesCount(params.storeId);
   const stocksCount = await getStocksCount(params.storeId);
+  const graphRevenue = await getGraphRevenue(params.storeId);
   return (
     <div className="flex-col">
       <div className="flex-1 space-y-4 p-8 pt-6">
@@ -61,7 +64,7 @@ export default async function DashboardPage({
             <CardTitle>Overview</CardTitle>
           </CardHeader>
           <CardContent className="pl-2">
-            {/* <Overview data={graphRevenue} /> */}
+            <Overview data={graphRevenue} />
           </CardContent>
         </Card>
       </div>
