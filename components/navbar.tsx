@@ -4,6 +4,7 @@ import MainNav from "./main-nav";
 import StoreSwitcher from "./store-switcher";
 import prismadb from "@/lib/prismadb";
 import { redirect } from "next/navigation";
+import { DarkModeButton } from "./dark-mode-button";
 
 export default async function Navbar() {
   const { userId } = auth();
@@ -13,7 +14,6 @@ export default async function Navbar() {
   }
 
   const items = await prismadb.store.findMany({ where: { userId } });
-  
 
   return (
     <div className="border-b">
@@ -21,6 +21,7 @@ export default async function Navbar() {
         <StoreSwitcher items={items} />
         <MainNav className="mx-6" />
         <div className="ml-auto flex items-center space-x-4">
+          <DarkModeButton />
           <UserButton afterSignOutUrl="/" />
         </div>
       </div>
